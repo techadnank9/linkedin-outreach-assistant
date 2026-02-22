@@ -64,3 +64,34 @@ You can also save JSON files directly with scripts:
 npm run save:manual
 npm run save:hiring-manager
 ```
+
+## Deployment (Render + Vercel)
+
+### 1) Deploy API on Render
+- This repo includes `/Users/adnan/Documents/linkedin-outreach-assistant/render.yaml`.
+- In Render:
+  1. Create new Blueprint from your GitHub repo.
+  2. Confirm service `linkedin-outreach-api`.
+  3. Set required secret env vars in Render:
+     - `SUPABASE_URL`
+     - `SUPABASE_SERVICE_ROLE_KEY`
+     - `GEMINI_API_KEY`
+     - `APIFY_API_TOKEN`
+     - `APIFY_LINKEDIN_ACTOR_ID`
+  4. Deploy and copy your Render domain, e.g. `linkedin-outreach-api.onrender.com`.
+
+### 2) Configure Vercel frontend proxy
+- This repo includes `/Users/adnan/Documents/linkedin-outreach-assistant/vercel.json`.
+- Replace `RENDER_API_DOMAIN` in `vercel.json` with your actual Render domain.
+- Example destination:
+  - `https://linkedin-outreach-api.onrender.com/api/$1`
+
+### 3) Deploy frontend on Vercel
+1. Import the same GitHub repo into Vercel.
+2. Framework preset: `Other`.
+3. No build command required.
+4. Deploy.
+
+After deploy:
+- Frontend served by Vercel.
+- `/api/*` requests are proxied to Render backend.

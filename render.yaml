@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: linkedin-outreach-api
+    runtime: node
+    plan: starter
+    autoDeploy: true
+    rootDir: .
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/apify-health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 10000
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: APIFY_API_TOKEN
+        sync: false
+      - key: APIFY_LINKEDIN_ACTOR_ID
+        sync: false
