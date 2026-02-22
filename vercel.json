@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://RENDER_API_DOMAIN/api/$1"
+      "destination": "https://linkedin-outreach-assistant.onrender.com/api/$1"
     }
   ],
   "routes": [
