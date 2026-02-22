@@ -23,7 +23,7 @@ import { mapManualToCandidateProfile, mapManualToTargetProfile } from './lib/man
 loadDotEnv();
 
 const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || '127.0.0.1';
+const HOST = process.env.HOST || '0.0.0.0';
 const PUBLIC_DIR = path.resolve(process.cwd(), 'public');
 
 function sendJson(res, statusCode, payload) {
