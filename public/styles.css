@@ -1,0 +1,110 @@
+:root {
+  --bg: #f4f8f5;
+  --ink: #1f2937;
+  --brand: #0f766e;
+  --brand-soft: #ccfbf1;
+  --panel: #ffffff;
+  --line: #d1d5db;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Manrope", "Avenir Next", sans-serif;
+  background: radial-gradient(circle at 20% 0%, #def7ec 0, var(--bg) 40%);
+  color: var(--ink);
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.9);
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(8px);
+}
+
+.topbar h1 { margin: 0; font-size: 1.25rem; }
+.topbar p { margin: 0.25rem 0 0; font-size: 0.9rem; color: #4b5563; }
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  padding: 1rem;
+}
+.onboarding-screen {
+  padding: 1rem;
+}
+.onboarding-card {
+  max-width: 680px;
+  margin: 0 auto;
+}
+.subtitle {
+  margin: 0.25rem 0 0.75rem;
+  color: #4b5563;
+  font-size: 0.92rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.stack { display: flex; flex-direction: column; gap: 0.5rem; }
+label { font-size: 0.85rem; font-weight: 600; }
+input {
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 44px;
+}
+button.primary, button[type="submit"], #extractCandidateBtn, #extractTargetBtn {
+  background: var(--brand);
+  color: #fff;
+}
+button.ghost { background: var(--brand-soft); color: #0f172a; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.hidden { display: none; }
+
+.variants {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.75rem;
+}
+.variant {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.75rem;
+  background: #fff;
+}
+.variant h4 { margin: 0 0 0.4rem; }
+.variant p { margin: 0 0 0.5rem; color: #374151; line-height: 1.4; }
+.copy-btn { background: #e5e7eb; color: #111827; }
+
+@media (min-width: 768px) {
+  .layout { grid-template-columns: 0.95fr 1.05fr; }
+}
+
+@media (max-width: 767px) {
+  .primary {
+    position: sticky;
+    bottom: 0.75rem;
+    width: 100%;
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "linkedin-outreach-assistant",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "test": "node --test",
+    "save:manual": "node scripts/save-manual-profile.mjs data/manual-profile.json",
+    "save:hiring-manager": "node scripts/save-manual-hiring-manager.mjs data/manual-hiring-manager.json"
+  },
+  "dependencies": {
+    "apify-client": "^2.22.2"
+  }
+}

@@ -1,0 +1,267 @@
+[
+  {
+    "linkedinUrl": "https://www.linkedin.com/in/aashish-parikh",
+    "firstName": "Aashish",
+    "lastName": "Parikh",
+    "fullName": "Aashish Parikh",
+    "headline": "Founder & CTO @ Azentic AI | AI-Driven Enterprise Automation",
+    "connections": 782,
+    "followers": 828,
+    "email": null,
+    "mobileNumber": null,
+    "jobTitle": "Co-Founder & CTO",
+    "jobStartedOn": "09-2025",
+    "jobLocation": null,
+    "jobStillWorking": true,
+    "companyName": "Azentic Ai",
+    "companyIndustry": "Internet",
+    "companyWebsite": "azentic.ai",
+    "companyLinkedin": "linkedin.com/company/azenticai",
+    "companyFoundedIn": null,
+    "companySize": "1-10",
+    "currentJobDuration": "6 mos",
+    "currentJobDurationInYrs": 0.5,
+    "topSkillsByEndorsements": null,
+    "addressCountryOnly": "United States",
+    "addressWithCountry": "Palo Alto, California, United States",
+    "addressWithoutCountry": "Palo Alto, California",
+    "profilePic": "https://media.licdn.com/dms/image/v2/D5603AQGdHsVKc9W3cA/profile-displayphoto-shrink_400_400/B56ZRrMXqAG8Ag-/0/1736965192809?e=1773273600&v=beta&t=NidnjELB3mgfj0rpUyVTM4_Z_LBuvO2ZNV1uXZ98F58",
+    "profilePicHighQuality": "https://media.licdn.com/dms/image/v2/D5603AQGdHsVKc9W3cA/profile-displayphoto-shrink_400_400/B56ZRrMXqAG8Ag-/0/1736965192809?e=1773273600&v=beta&t=NidnjELB3mgfj0rpUyVTM4_Z_LBuvO2ZNV1uXZ98F58",
+    "backgroundPic": null,
+    "linkedinId": null,
+    "isPremium": null,
+    "isVerified": false,
+    "isJobSeeker": null,
+    "isRetired": null,
+    "isCreator": null,
+    "isInfluencer": null,
+    "isCurrentlyEmployed": true,
+    "about": "I’m the Co-Founder & CTO of Azentic AI, where we’re building an AI-driven enterprise automation and execution platform.\n\nOver the last 20 years, I’ve built deep infrastructure and applied intelligence systems from hypervisors and distributed schedulers, to cloud platforms, and now AI systems that automate complex enterprise workflows.\n\nI focus on solving hard technical problems and turning them into impactful, real-world products.\n\n• Co-Founder & CTO, Azentic AI: AI-driven enterprise automation & execution platform\n• Founder & CEO, Sigmux Networks: a successful, bootstrapped, application-aware networking company\n• Founding Engineer & Technical Lead, ZeroStack: venture-funded private cloud platform\n• Principal Investigator, VMware XLR8+: led incubated R&D initiatives backed by VMware’s OCTO/CEO\n• Core Contributor, VMware DRS: flagship system used by thousands of enterprise customers\n• Advisor to early-stage founders on architecture, scale, and product execution\n\nI enjoy connecting with fellow founders and technically ambitious engineers building hard things.",
+    "publicIdentifier": "aashish-parikh",
+    "linkedinPublicUrl": "https://www.linkedin.com/in/aashish-parikh",
+    "openConnection": true,
+    "urn": "ACoAAACeqrQB-jTuRGwAwbpYJOCzd6fLE-Rmt4w",
+    "totalRecommendationsReceived": 2,
+    "totalRecommendationsGiven": 2,
+    "birthday": null,
+    "associatedHashtag": [],
+    "firstRoleYear": 2025,
+    "totalExperienceYears": 0.4,
+    "experiencesCount": 5,
+    "experiences": [
+      {
+        "companyId": "105357374",
+        "companyUrn": "urn:li:fsd_company:105357374",
+        "companyLink1": "https://www.linkedin.com/company/105357374/",
+        "companyName": "Azentic Ai",
+        "companySize": "1-10",
+        "companyWebsite": "azentic.ai",
+        "companyIndustry": "Internet",
+        "logo": "https://media.licdn.com/dms/image/v2/D560BAQEIrpT_cHrq1g/company-logo_400_400/B56ZlYGUkyKEAY-/0/1758119676482/azenticai_logo?e=1773273600&v=beta&t=ANRvJz5xjI7vETqfFD3NTzY36eukiDVe_2VcokXvWpc",
+        "title": "Co-Founder & CTO",
+        "jobDescription": null,
+        "jobStartedOn": "09-2025",
+        "jobEndedOn": null,
+        "jobLocation": null,
+        "jobStillWorking": true,
+        "jobLocationCountry": null,
+        "employmentType": null
+      },
+      {
+        "companyId": null,
+        "companyUrn": null,
+        "companyLink1": "https://www.linkedin.com/search/results/all/?keywords=Technical+advisor+%26+consultant",
+        "companyName": null,
+        "companySize": null,
+        "companyWebsite": null,
+        "companyIndustry": null,
+        "logo": null,
+        "title": "Technical advisor & consultant",
+        "jobDescription": "I mentor early-stage startup founders (company sizes \u003C 10 employees) as they find customer traction. If we have worked together before and you think I can help, please reach out.\n\nFocus areas\no Rearchitecting software and backend systems for scale\no Feature experimentation for efficacy and performance",
+        "jobStartedOn": null,
+        "jobEndedOn": null,
+        "jobLocation": "San Jose, California, United States · On-site",
+        "jobStillWorking": true,
+        "jobLocationCountry": null,
+        "employmentType": null
+      },
+      {
+        "companyId": "1211050",
+        "companyUrn": "urn:li:fsd_company:1211050",
+        "companyLink1": "https://www.linkedin.com/company/1211050/",
+        "companyName": null,
+        "companySize": null,
+        "companyWebsite": null,
+        "companyIndustry": null,
+        "logo": "undefinedundefined",
+        "title": "Sabbatical & Foundation at Family office",
+        "jobDescription": "Family foundation, finance & investments",
+        "jobStartedOn": null,
+        "jobEndedOn": null,
+        "jobLocation": "San Jose, California, United States · On-site",
+        "jobStillWorking": false,
+        "jobLocationCountry": null,
+        "employmentType": null
+      },
+      {
+        "companyId": null,
+        "companyUrn": null,
+        "companyLink1": "https://www.linkedin.com/search/results/all/?keywords=Sigmux+Networks",
+        "companyName": null,
+        "companySize": null,
+        "companyWebsite": null,
+        "companyIndustry": null,
+        "logo": null,
+        "title": "Founder & CEO",
+        "jobDescription": "At Sigmux, we set out to solve the problem of poor quality, expensive streaming of rich media to mobile devices. We built SynX, an application-aware network cache, to dramatically improve media goodput. Our customers included media/social media companies.\n\nProduct highlights\no SynX initiated in-app caches and discovered peers via proximity, multicast & the Sigmux cloud broker\no Content selection personalized via prediction algorithms or app policies\no Caches eagerly populated with offline content via peer-to-peer transport via local, unmetered networks\no Support for HLS, MPEG4 and raw media modes, special pathways for cached & transparent ad-delivery\no Built-in safeguards: dynamic network calibration, self-throttling & obfuscation for privacy",
+        "jobStartedOn": null,
+        "jobEndedOn": null,
+        "jobLocation": "San Jose, California, United States · On-site",
+        "jobStillWorking": false,
+        "jobLocationCountry": null,
+        "employmentType": null
+      },
+      {
+        "companyId": "6410715",
+        "companyUrn": "urn:li:fsd_company:6410715",
+        "companyLink1": "https://www.linkedin.com/company/6410715/",
+        "companyName": null,
+        "companySize": null,
+        "companyWebsite": null,
+        "companyIndustry": null,
+        "logo": "https://media.licdn.com/dms/image/v2/C560BAQH8M9MruGCIyw/company-logo_200_200/company-logo_200_200/0/1631302208378?e=1773273600&v=beta&t=Ev7dpgduJOz96YFyGZ-ZwgIgFJks63LDMST5VQhJwnU",
+        "title": "Founding engineer & Technical Lead",
+        "jobDescription": "ZeroStack was a venture-funded private cloud company. It combined scale-out, on-premises, secure appliances with a cloud-based self-service management portal to offer the best of private & public clouds. As the founding engineer (employee #1), I worked on almost every part of the product and the company and built large pieces of our underlying infrastructure.\n\nKey contributions\no Helped build early engineering, product & sales teams to get the company off the ground\no Led the early customer interface team, setting up the alpha & beta validation process\no Presented ZeroStack’s product at various technical and industry venues\no As technical lead, built large parts of the underlying technical infrastructure\n\nMemorable technical projects\no Integrated hybrid cloud management system - no VMware & AWS VMs left behind\no Service-managing sidecars and private-public cloud pipeline for data & control operations\no Stats telemetry & events management, OpenStack API integration\no Hyperconverged appliance deployment and private cloud platform",
+        "jobStartedOn": null,
+        "jobEndedOn": null,
+        "jobLocation": "Mountain View, California, United States · On-site",
+        "jobStillWorking": false,
+        "jobLocationCountry": null,
+        "employmentType": null
+      }
+    ],
+    "updates": [],
+    "skills": [],
+    "creatorWebsite": [],
+    "profilePicAllDimensions": [],
+    "educations": [
+      {
+        "companyId": "4282",
+        "companyUrn": "urn:li:fsd_company:4282",
+        "companyLink1": "https://www.linkedin.com/company/4282/",
+        "logo": "https://media.licdn.com/dms/image/v2/C560BAQEEUHxMAR-Q6w/company-logo_200_200/company-logo_200_200/0/1671048448447/uflorida_logo?e=1773273600&v=beta&t=PjKRMdMjB4rQJWC9YlxIS-yMv4eh0RkL24VqVSOrnlE",
+        "title": "University of Florida",
+        "subtitle": null,
+        "description": null,
+        "grade": null,
+        "period": {
+          "startedOn": null,
+          "endedOn": null
+        }
+      },
+      {
+        "companyId": "9875665",
+        "companyUrn": "urn:li:fsd_company:9875665",
+        "companyLink1": "https://www.linkedin.com/company/9875665/",
+        "logo": "https://media.licdn.com/dms/image/v2/C560BAQFnYPDIXmEmVA/company-logo_200_200/company-logo_200_200/0/1631385709034?e=1773273600&v=beta&t=_F7NoRjPcIFcbNHEsv2ZU7LzZWLxzEpyyt7upjF0t7A",
+        "title": "University of Madras",
+        "subtitle": null,
+        "description": null,
+        "grade": null,
+        "period": {
+          "startedOn": null,
+          "endedOn": null
+        }
+      }
+    ],
+    "licenseAndCertificates": [],
+    "honorsAndAwards": [],
+    "languages": [],
+    "volunteerAndAwards": [],
+    "verifications": [],
+    "promos": [],
+    "highlights": [],
+    "projects": [],
+    "publications": [],
+    "patents": [],
+    "courses": [],
+    "testScores": [],
+    "organizations": [],
+    "volunteerCauses": [],
+    "interests": [],
+    "recommendationsReceived": [
+      {
+        "titleV2": "Samit Sawant",
+        "caption": "August 15, 2014, Samit worked with Aashish but on different teams",
+        "subtitle": "Senior Engineering Manager at Branch",
+        "size": "LARGE",
+        "textActionTarget": "https://www.linkedin.com/in/samitsawant",
+        "subComponents": [
+          {
+            "fixedListComponent": [
+              {
+                "type": "textComponent",
+                "text": "Aashish is a very smart and creative individual. He is very interested in researching new ideas and algorithms. He has clear focus on his work but also thinks about the big picture as well. This attitude led him to propose a research idea which was welcomed by his team and accepted for funding.\r\n\r\nI had also worked with Aashish before in the same team and he is also very helpful and a team member to the core. He will be a valuable asset anywhere he works."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "titleV2": "Puneet Zaroo",
+        "caption": "July 25, 2014, Puneet worked with Aashish on the same team",
+        "subtitle": "Engineering Lead, Data Platform, Netflix",
+        "size": "LARGE",
+        "textActionTarget": "https://www.linkedin.com/in/puneetz",
+        "subComponents": [
+          {
+            "fixedListComponent": [
+              {
+                "type": "textComponent",
+                "text": "Aashish is an accomplished engineer, having implemented core components of VMware's DRS product. He is an excellent team player and mentors junior engineers very effectively. He is an excellent communicator able to interface effectively with a diverse set of people, including other engineers, product marketing, customers and execs. Based on his all-around qualities, I whole heartedly recommend him for a senior engineering / tech-lead role."
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "recommendations": [
+      {
+        "titleV2": "Puneet Zaroo",
+        "caption": "April 16, 2017, Aashish worked with Puneet on the same team",
+        "subtitle": "Engineering Lead, Data Platform, Netflix",
+        "size": "LARGE",
+        "textActionTarget": "https://www.linkedin.com/in/puneetz",
+        "subComponents": [
+          {
+            "fixedListComponent": [
+              {
+                "type": "textComponent",
+                "text": "Puneet \"Zaroonet\" joined ZeroStack early and we were thrilled to have him on board. He brought his top-notch systems experience to the table and helped implement important parts of the ZeroStack cloud platform. In addition, he helped \"tame\" our fairly complex system, playing whack-a-mole with bugs surely & steadily - Puneet is routinely the person everyone turned too when a particularly dogged piece of debugging was required.\r\n\r\nOne of his specialties is working on hardening systems and scaling them up - he grinds on the problem, whittling it away. I've seen him do this very effectively in two separate contexts.\r\n\r\nI really admire Puneet's attitude when it comes to technical ownership. In addition to designing and implementing new features, he always makes sure that these are well-tested and documented. All of us should do all this all the time, but Puneet does this more often than most.\r\n\r\nPuneet is friendly, super-\"zen\", respectful and extremely easy to work with. We have worked together as team-mates twice (two different companies), and I can only hope for more!"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "titleV2": "Arun Mittal",
+        "caption": "January 18, 2017, Aashish was senior to Arun but didn't manage Arun directly",
+        "subtitle": "Virtualization | Coud | Automation | Developer Tools",
+        "size": "LARGE",
+        "textActionTarget": "https://www.linkedin.com/in/arun-mittal-490aa0a",
+        "image": "https://media.licdn.com/dms/image/v2/C5603AQHAMI0ytGQj8w/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1593736222118?e=1773273600&v=beta&t=x1B7FeeXmriAqrDiEk4Wu3RYuecD9jjbmkSNrnS2UHU",
+        "subComponents": [
+          {
+            "fixedListComponent": [
+              {
+                "type": "textComponent",
+                "text": "I enjoyed working with Arun for around a year at ZeroStack, where he was a senior QA engineer. It takes a special skill-set - and patience! - to carefully test a large, brand-new product in its early days. Arun contributed significantly to the high quality of the ZeroStack Cloud Platform.\r\n\r\nArun is organized, methodical and detail-oriented in his work - this makes him a strong engineer. He also communicates progress very well and manages expectations - this makes him a valuable team member. Good senior QA engineers are rare - and Arun is one of them."
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "peopleAlsoViewed": []
+  }
+]

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LinkedIn Outreach Assistant</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>LinkedIn Outreach Assistant</h1>
+        <p>Personalized outreach drafts from your profile + hiring manager profile</p>
+      </div>
+      <button id="refreshProfileBtn" class="ghost">Refresh Profile</button>
+    </header>
+
+    <main>
+      <section id="onboardingScreen" class="onboarding-screen">
+        <div class="panel onboarding-card">
+          <h2>Start With Your LinkedIn</h2>
+          <p class="subtitle">Paste your profile URL once. We will extract and prefill your profile details.</p>
+
+          <div id="onboardingBlock" class="stack">
+          <label>Your LinkedIn URL (one-time)</label>
+          <input id="candidateUrl" type="url" placeholder="https://www.linkedin.com/in/your-name" />
+          <button id="extractCandidateBtn">Extract & Fill</button>
+        </div>
+
+        <form id="candidateForm" class="stack hidden">
+          <h3>Review Your Profile</h3>
+          <label>Name</label>
+          <input id="candidateName" />
+          <label>Headline</label>
+          <input id="candidateHeadline" />
+          <label>Top Achievement</label>
+          <input id="candidateAchievement" />
+          <label>Top Skill</label>
+          <input id="candidateSkill" />
+          <button type="submit">Save & Continue</button>
+        </form>
+      </section>
+      </section>
+
+      <section id="workspace" class="layout hidden">
+        <section class="panel context">
+          <h2>Your Profile (Saved)</h2>
+          <p class="subtitle">Your profile is reused for every outreach draft.</p>
+        </section>
+
+      <section class="panel composer">
+        <h2>Target + Compose</h2>
+        <div class="stack">
+          <label>Hiring Manager/Founder LinkedIn URL</label>
+          <input id="targetUrl" type="url" placeholder="https://www.linkedin.com/in/hiring-manager" />
+          <button id="extractTargetBtn">Extract Target</button>
+        </div>
+
+        <form id="targetForm" class="stack hidden">
+          <label>Name</label>
+          <input id="targetName" />
+          <label>Role</label>
+          <input id="targetRole" />
+          <label>Company</label>
+          <input id="targetCompany" />
+          <label>Focus Area</label>
+          <input id="targetFocus" />
+        </form>
+
+        <button id="generateBtn" class="primary" disabled>Generate 3 Emails</button>
+
+        <div id="variants" class="variants"></div>
+      </section>
+      </section>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
