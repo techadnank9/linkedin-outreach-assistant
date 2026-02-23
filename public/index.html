@@ -14,13 +14,14 @@
       </div>
       <button id="refreshProfileBtn" class="ghost">Refresh Profile</button>
     </header>
+    <div id="loadingBanner" class="loading-banner hidden" role="status" aria-live="polite">
+      <span class="loading-dot" aria-hidden="true"></span>
+      <span id="loadingText">Processing request...</span>
+    </div>
 
     <main>
       <section id="onboardingScreen" class="onboarding-screen">
         <div class="panel onboarding-card">
-          <div class="eyebrow-row">
-            <span class="chip">LinkedIn URL in 1 step</span>
-          </div>
           <h2>Start With Your LinkedIn</h2>
 
           <div id="onboardingBlock" class="stack">
@@ -78,8 +79,7 @@
             <div id="skillsChips" class="skills-chips"></div>
           </section>
 
-          <label>Skills List (comma-separated)</label>
-          <input id="candidateSkillsList" />
+          <input id="candidateSkillsList" class="hidden" />
           <label>Top Achievement</label>
           <input id="candidateAchievement" />
           <button type="submit">Save & Continue</button>
@@ -102,8 +102,8 @@
 
       <section class="panel composer">
         <div id="composeTitleRow" class="compose-title-row">
-          <h2>Target + Compose</h2>
-          <p class="compose-subtitle">Extract hiring manager context, review details, then generate tailored outreach.</p>
+          <h2>Outreach Composer</h2>
+          <p class="compose-subtitle">Add the hiring manager profile to generate polished, personalized outreach drafts.</p>
         </div>
 
         <div class="target-actions-row">
@@ -111,8 +111,8 @@
         </div>
 
         <div id="targetInputCard" class="target-card stack">
-          <input id="targetUrl" type="url" placeholder="Paste hiring manager LinkedIn URL" />
-          <button id="extractTargetBtn">Extract Target</button>
+          <input id="targetUrl" type="url" placeholder="Enter hiring manager LinkedIn profile URL" />
+          <button id="extractTargetBtn">Analyze Hiring Profile</button>
         </div>
 
         <div id="targetSnapshot" class="profile-snapshot hidden">
@@ -135,7 +135,7 @@
           <input id="targetFocus" />
         </form>
 
-        <button id="generateBtn" class="ghost action-generate" disabled>Generate 3 Emails</button>
+        <button id="generateBtn" class="ghost action-generate" disabled>Generate 3 Tailored Drafts</button>
 
         <div id="variants" class="variants"></div>
       </section>

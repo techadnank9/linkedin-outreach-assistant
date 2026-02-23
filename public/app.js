@@ -5,6 +5,9 @@ const candidateForm = document.getElementById('candidateForm');
 const targetForm = document.getElementById('targetForm');
 const composeTitleRow = document.getElementById('composeTitleRow');
 const generateBtn = document.getElementById('generateBtn');
+const refreshProfileBtn = document.getElementById('refreshProfileBtn');
+const loadingBanner = document.getElementById('loadingBanner');
+const loadingText = document.getElementById('loadingText');
 const variantsEl = document.getElementById('variants');
 const showTargetInputBtn = document.getElementById('showTargetInputBtn');
 const targetInputCard = document.getElementById('targetInputCard');
@@ -25,6 +28,27 @@ const state = {
   target: null,
   draftSessionId: null
 };
+
+function setGlobalLoading(isLoading, message = 'Processing request...') {
+  if (!loadingBanner || !loadingText) return;
+  if (isLoading) {
+    loadingText.textContent = message;
+    loadingBanner.classList.remove('hidden');
+    return;
+  }
+  loadingBanner.classList.add('hidden');
+}
+
+function setButtonLoading(button, isLoading, defaultLabel, loadingLabel) {
+  if (!button) return;
+  if (isLoading) {
+    button.disabled = true;
+    button.textContent = loadingLabel;
+    return;
+  }
+  button.disabled = false;
+  button.textContent = defaultLabel;
+}
 
 function updateTargetEntryUI() {
   if (state.target) {
@@ -248,7 +272,10 @@ async function loadSavedProfile() {
 }
 
 document.getElementById('extractCandidateBtn').addEventListener('click', async () => {
+  const button = document.getElementById('extractCandidateBtn');
   try {
+    setGlobalLoading(true, 'Extracting your LinkedIn profile...');
+    setButtonLoading(button, true, 'Extract & Fill', 'Extracting...');
     const url = document.getElementById('candidateUrl').value.trim();
     const data = await postJson('/api/extract', { url, profileType: 'candidate' });
     state.candidate = data.profile;
@@ -256,6 +283,9 @@ document.getElementById('extractCandidateBtn').addEventListener('click', async (
     renderProfileSnapshot(data.profile);
   } catch (error) {
     alert(error.message);
+  } finally {
+    setGlobalLoading(false);
+    setButtonLoading(button, false, 'Extract & Fill', 'Extracting...');
   }
 });
 
@@ -269,7 +299,10 @@ document.getElementById('candidateSkillsList').addEventListener('input', event =
 
 candidateForm.addEventListener('submit', async event => {
   event.preventDefault();
+  const button = candidateForm.querySelector('button[type="submit"]');
   try {
+    setGlobalLoading(true, 'Saving your profile...');
+    setButtonLoading(button, true, 'Save & Continue', 'Saving...');
     state.candidate = collectCandidateFromForm();
     const payload = await postJson('/api/profile/save', { profile: state.candidate });
     state.candidate = payload.profile;
@@ -278,11 +311,17 @@ candidateForm.addEventListener('submit', async event => {
     generateBtn.disabled = !state.target;
   } catch (error) {
     alert(error.message);
+  } finally {
+    setGlobalLoading(false);
+    setButtonLoading(button, false, 'Save & Continue', 'Saving...');
   }
 });
 
 document.getElementById('extractTargetBtn').addEventListener('click', async () => {
+  const button = document.getElementById('extractTargetBtn');
   try {
+    setGlobalLoading(true, 'Analyzing hiring manager profile...');
+    setButtonLoading(button, true, 'Analyze Hiring Profile', 'Analyzing...');
     const url = document.getElementById('targetUrl').value.trim();
     const data = await postJson('/api/extract', { url, profileType: 'target' });
     state.target = data.profile;
@@ -292,6 +331,9 @@ document.getElementById('extractTargetBtn').addEventListener('click', async () =
     generateBtn.disabled = !state.candidate;
   } catch (error) {
     alert(error.message);
+  } finally {
+    setGlobalLoading(false);
+    setButtonLoading(button, false, 'Analyze Hiring Profile', 'Analyzing...');
   }
 });
 
@@ -300,14 +342,19 @@ showTargetInputBtn.addEventListener('click', () => {
   document.getElementById('targetUrl').focus();
 });
 
-document.getElementById('refreshProfileBtn').addEventListener('click', async () => {
+refreshProfileBtn.addEventListener('click', async () => {
   try {
+    setGlobalLoading(true, 'Clearing saved profile...');
+    setButtonLoading(refreshProfileBtn, true, 'Refresh Profile', 'Refreshing...');
     await postJson('/api/profile/reset', {
       linkedinUrl: state.candidate?.linkedinUrl || null
     });
   } catch (error) {
     alert(error.message);
     return;
+  } finally {
+    setGlobalLoading(false);
+    setButtonLoading(refreshProfileBtn, false, 'Refresh Profile', 'Refreshing...');
   }
 
   showOnboarding();
@@ -329,6 +376,8 @@ document.getElementById('refreshProfileBtn').addEventListener('click', async () 
 
 generateBtn.addEventListener('click', async () => {
   try {
+    setGlobalLoading(true, 'Generating personalized email drafts...');
+    setButtonLoading(generateBtn, true, 'Generate 3 Tailored Drafts', 'Generating...');
     state.candidate = collectCandidateFromForm();
     state.target = collectTargetFromForm();
     const data = await postJson('/api/generate', {
@@ -339,6 +388,10 @@ generateBtn.addEventListener('click', async () => {
     renderVariants(data.variants);
   } catch (error) {
     alert(error.message);
+  } finally {
+    setGlobalLoading(false);
+    setButtonLoading(generateBtn, false, 'Generate 3 Tailored Drafts', 'Generating...');
+    generateBtn.disabled = !state.candidate || !state.target;
   }
 });
 

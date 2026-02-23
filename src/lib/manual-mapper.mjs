@@ -29,11 +29,33 @@ function extractHighestEducation(payload) {
 }
 
 function extractYearsOfExperience(payload) {
-  if (typeof payload?.totalExperienceYears === 'number') return payload.totalExperienceYears;
+  if (
+    typeof payload?.totalExperienceYears === 'number' &&
+    Number.isFinite(payload.totalExperienceYears) &&
+    payload.totalExperienceYears > 0
+  ) {
+    return payload.totalExperienceYears;
+  }
+
+  const about = typeof payload?.about === 'string' ? payload.about : '';
+  const aboutYearsMatch = about.match(/(\d+(?:\.\d+)?)\s*\+?\s*years?/i);
+  if (aboutYearsMatch) {
+    return Number(aboutYearsMatch[1]);
+  }
+
+  if (
+    typeof payload?.currentJobDurationInYrs === 'number' &&
+    Number.isFinite(payload.currentJobDurationInYrs) &&
+    payload.currentJobDurationInYrs > 0
+  ) {
+    return Number(payload.currentJobDurationInYrs.toFixed(2));
+  }
+
   if (typeof payload?.firstRoleYear === 'number') {
     const currentYear = new Date().getFullYear();
     return Math.max(0, currentYear - payload.firstRoleYear);
   }
+
   return null;
 }
 

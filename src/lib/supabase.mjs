@@ -69,16 +69,9 @@ export async function saveCandidateProfile(profile) {
 }
 
 export async function resetSavedCandidateProfile(linkedinUrl = null) {
-  if (linkedinUrl) {
-    const normalizedUrl = normalizeLinkedInUrl(linkedinUrl);
-    await supabaseRequest(
-      `/candidate_profiles?linkedin_url=eq.${encodeURIComponent(normalizedUrl)}`,
-      { method: 'DELETE', headers: { Prefer: 'return=minimal' } }
-    );
-    return;
-  }
-
-  // Fallback: remove all saved candidate profiles in this MVP (single-user behavior).
+  // Single-user behavior: refresh should forget any remembered candidate profile,
+  // regardless of which profile URL was active.
+  void linkedinUrl;
   await supabaseRequest('/candidate_profiles?id=not.is.null', {
     method: 'DELETE',
     headers: { Prefer: 'return=minimal' }
@@ -86,13 +79,33 @@ export async function resetSavedCandidateProfile(linkedinUrl = null) {
 }
 
 export async function saveTargetProfile(profile) {
+  const normalizedLinkedinUrl = profile.linkedinUrl
+    ? normalizeLinkedInUrl(profile.linkedinUrl)
+    : null;
+
   const payload = {
-    linkedin_url: profile.linkedinUrl || null,
+    linkedin_url: normalizedLinkedinUrl,
     name: profile.name || null,
     role: profile.role || null,
     company: profile.company || null,
     focus_areas: profile.focusAreas || []
   };
+
+  if (normalizedLinkedinUrl) {
+    const existing = await supabaseRequest(
+      `/target_profiles?select=id&linkedin_url=eq.${encodeURIComponent(normalizedLinkedinUrl)}&limit=1`
+    );
+    const existingId = existing?.[0]?.id;
+
+    if (existingId) {
+      const rows = await supabaseRequest(`/target_profiles?id=eq.${existingId}`, {
+        method: 'PATCH',
+        headers: { Prefer: 'return=representation' },
+        body: JSON.stringify(payload)
+      });
+      return rows[0];
+    }
+  }
 
   const rows = await supabaseRequest('/target_profiles', {
     method: 'POST',

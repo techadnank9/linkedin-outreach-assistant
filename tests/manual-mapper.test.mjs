@@ -48,3 +48,15 @@ test('mapManualToTargetProfile maps manual payload to target row shape', () => {
   assert.equal(mapped.company, 'Centific');
   assert.deepEqual(mapped.focusAreas, ['Wordpress Development', 'Microsoft Azure']);
 });
+
+test('mapManualToCandidateProfile infers years from about text when totalExperienceYears is zero', () => {
+  const mapped = mapManualToCandidateProfile(
+    {
+      ...payload,
+      totalExperienceYears: 0,
+      about: 'Mohammed Adnan has 5+ years of expertise in full-stack web development.'
+    },
+    payload.linkedinUrl
+  );
+  assert.equal(mapped.yearsOfExperience, 5);
+});
