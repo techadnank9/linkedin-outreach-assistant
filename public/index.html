@@ -22,8 +22,6 @@
     <main>
       <section id="onboardingScreen" class="onboarding-screen">
         <div class="panel onboarding-card">
-          <h2>Start With Your LinkedIn</h2>
-
           <div id="onboardingBlock" class="stack">
           <label>Your LinkedIn URL</label>
           <input id="candidateUrl" type="url" placeholder="https://www.linkedin.com/in/your-name" />
@@ -45,8 +43,15 @@
         </div>
 
         <form id="candidateForm" class="stack hidden">
-          <h3>Review Your Profile</h3>
           <section class="profile-facts">
+            <div class="fact-row">
+              <span class="fact-icon" aria-hidden="true">👤</span>
+              <input id="candidateNameInline" class="fact-input" placeholder="Your Name" />
+            </div>
+            <div class="fact-row">
+              <span class="fact-icon" aria-hidden="true">🎓</span>
+              <input id="candidateEducationInline" class="fact-input" placeholder="Highest Education" />
+            </div>
             <div class="fact-row">
               <span class="fact-icon" aria-hidden="true">📍</span>
               <input id="candidateLocation" class="fact-input" placeholder="Location" />
@@ -55,22 +60,13 @@
               <span class="fact-icon" aria-hidden="true">🧳</span>
               <input id="candidateYearsExperience" class="fact-input" placeholder="Years of Experience" />
             </div>
-            <div class="fact-row">
-              <span class="fact-icon" aria-hidden="true">💼</span>
-              <input id="candidateCompensation" class="fact-input" placeholder="₹ 0" />
-            </div>
           </section>
 
-          <label>Name</label>
-          <input id="candidateName" />
-          <label>Headline</label>
-          <input id="candidateHeadline" />
-          <label>Email</label>
-          <input id="candidateEmail" />
-          <label>Phone</label>
-          <input id="candidatePhone" />
-          <label>Highest Education</label>
-          <input id="candidateEducation" />
+          <input id="candidateName" class="hidden" />
+          <input id="candidateHeadline" class="hidden" />
+          <input id="candidateEmail" class="hidden" />
+          <input id="candidatePhone" class="hidden" />
+          <input id="candidateEducation" class="hidden" />
 
           <section class="skills-card">
             <div class="skills-header-row">
@@ -80,8 +76,7 @@
           </section>
 
           <input id="candidateSkillsList" class="hidden" />
-          <label>Top Achievement</label>
-          <input id="candidateAchievement" />
+          <input id="candidateAchievement" class="hidden" />
           <button type="submit">Save & Continue</button>
         </form>
       </section>

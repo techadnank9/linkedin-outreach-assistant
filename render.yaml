@@ -29,5 +29,3 @@ services:
         sync: false
       - key: EXTRACT_IP_MAX_PER_MIN
         value: 20
-      - key: EXTRACT_URL_COOLDOWN_MS
-        value: 15000

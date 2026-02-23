@@ -25,9 +25,7 @@ const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 const PUBLIC_DIR = path.resolve(process.cwd(), 'public');
 const REQUESTS_PER_MINUTE = Number(process.env.EXTRACT_IP_MAX_PER_MIN || 20);
-const URL_COOLDOWN_MS = Number(process.env.EXTRACT_URL_COOLDOWN_MS || 15000);
 const ipWindow = new Map();
-const urlWindow = new Map();
 
 function sendJson(res, statusCode, payload) {
   res.writeHead(statusCode, { 'Content-Type': 'application/json' });
@@ -77,16 +75,6 @@ function canProcessByIp(ip) {
   entries.push(now);
   ipWindow.set(ip, entries);
   return entries.length <= REQUESTS_PER_MINUTE;
-}
-
-function canProcessByUrl(url) {
-  const now = Date.now();
-  const previous = urlWindow.get(url) || 0;
-  if (now - previous < URL_COOLDOWN_MS) {
-    return false;
-  }
-  urlWindow.set(url, now);
-  return true;
 }
 
 function cleanNullableString(value) {
@@ -165,9 +153,6 @@ const server = http.createServer(async (req, res) => {
       const ip = req.socket?.remoteAddress || 'unknown';
       if (!canProcessByIp(ip)) {
         return sendJson(res, 429, { error: 'Too many extraction requests. Please wait and retry.' });
-      }
-      if (!canProcessByUrl(body.url)) {
-        return sendJson(res, 429, { error: 'This profile was requested moments ago. Please retry shortly.' });
       }
 
       let scraped;

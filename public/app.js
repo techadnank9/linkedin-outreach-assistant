@@ -79,14 +79,17 @@ async function postJson(url, payload) {
 
 function hydrateCandidateForm(profile) {
   document.getElementById('candidateName').value = profile.name || '';
+  document.getElementById('candidateNameInline').value = profile.name || '';
   document.getElementById('candidateHeadline').value = profile.headline || '';
   document.getElementById('candidateLocation').value = profile.location || '';
   document.getElementById('candidateEmail').value = profile.email || '';
   document.getElementById('candidatePhone').value = profile.phone || '';
   document.getElementById('candidateEducation').value = profile.highestEducation || '';
+  document.getElementById('candidateEducationInline').value = profile.highestEducation || '';
   document.getElementById('candidateYearsExperience').value =
-    profile.yearsOfExperience != null ? String(profile.yearsOfExperience) : '';
-  document.getElementById('candidateCompensation').value = profile.compensation || '₹ 0';
+    profile.yearsOfExperience != null && profile.yearsOfExperience !== ''
+      ? `${profile.yearsOfExperience} years`
+      : '';
   const skillsList = Array.isArray(profile.skillsList) ? profile.skillsList : profile.skills || [];
   document.getElementById('candidateSkillsList').value = skillsList.join(', ');
   renderSkillChips(skillsList);
@@ -173,6 +176,13 @@ function renderTargetSnapshot(profile) {
 }
 
 function collectCandidateFromForm() {
+  const candidateName = document.getElementById('candidateNameInline').value.trim();
+  document.getElementById('candidateName').value = candidateName;
+  const candidateEducation = document.getElementById('candidateEducationInline').value.trim();
+  document.getElementById('candidateEducation').value = candidateEducation;
+  const yearsRaw = document.getElementById('candidateYearsExperience').value.trim();
+  const yearsMatch = yearsRaw.match(/(\d+(?:\.\d+)?)/);
+  const yearsOfExperience = yearsMatch ? Number(yearsMatch[1]) : 0;
   const skillsList = document.getElementById('candidateSkillsList').value
     .split(',')
     .map(s => s.trim())
@@ -181,14 +191,13 @@ function collectCandidateFromForm() {
   return {
     id: state.candidate?.id,
     linkedinUrl: state.candidate?.linkedinUrl || null,
-    name: document.getElementById('candidateName').value.trim(),
+    name: candidateName,
     headline: document.getElementById('candidateHeadline').value.trim(),
     location: document.getElementById('candidateLocation').value.trim(),
     email: document.getElementById('candidateEmail').value.trim(),
     phone: document.getElementById('candidatePhone').value.trim(),
-    highestEducation: document.getElementById('candidateEducation').value.trim(),
-    yearsOfExperience: Number(document.getElementById('candidateYearsExperience').value || 0),
-    compensation: document.getElementById('candidateCompensation').value.trim(),
+    highestEducation: candidateEducation,
+    yearsOfExperience,
     skillsList,
     achievements: [document.getElementById('candidateAchievement').value.trim()].filter(Boolean),
     skills: [...new Set(skillsList.filter(Boolean))]
@@ -295,6 +304,14 @@ document.getElementById('candidateSkillsList').addEventListener('input', event =
     .map(s => s.trim())
     .filter(Boolean);
   renderSkillChips(skills);
+});
+
+document.getElementById('candidateNameInline').addEventListener('input', event => {
+  document.getElementById('candidateName').value = event.target.value;
+});
+
+document.getElementById('candidateEducationInline').addEventListener('input', event => {
+  document.getElementById('candidateEducation').value = event.target.value;
 });
 
 candidateForm.addEventListener('submit', async event => {
