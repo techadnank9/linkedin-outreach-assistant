@@ -214,14 +214,22 @@ function renderTargetSnapshot(profile) {
     targetSnapshotNameEl.textContent = '-';
     targetSnapshotRoleEl.textContent = '-';
     targetSnapshotCompanyEl.textContent = 'Company: -';
-    targetSnapshotFocusEl.textContent = 'Focus: -';
+    targetSnapshotFocusEl.textContent = '';
+    targetSnapshotFocusEl.classList.add('hidden');
     return;
   }
 
   targetSnapshotNameEl.textContent = profile.name || 'Hiring Manager';
   targetSnapshotRoleEl.textContent = profile.role || 'Role not available';
   targetSnapshotCompanyEl.textContent = `Company: ${profile.company || '-'}`;
-  targetSnapshotFocusEl.textContent = `Focus: ${profile.focusAreas?.[0] || '-'}`;
+  const focus = profile.focusAreas?.[0] || '';
+  if (focus) {
+    targetSnapshotFocusEl.textContent = `Focus: ${focus}`;
+    targetSnapshotFocusEl.classList.remove('hidden');
+  } else {
+    targetSnapshotFocusEl.textContent = '';
+    targetSnapshotFocusEl.classList.add('hidden');
+  }
   targetSnapshotEl.classList.remove('hidden');
 }
 
@@ -467,7 +475,7 @@ refreshProfileBtn.addEventListener('click', async () => {
 generateBtn.addEventListener('click', async () => {
   try {
     setGlobalLoading(true, 'Generating personalized email drafts...');
-    setButtonLoading(generateBtn, true, 'Generate 3 Tailored Drafts', 'Generating...');
+    setButtonLoading(generateBtn, true, 'Draft Email', 'Generating...');
     state.candidate = collectCandidateFromForm();
     state.target = collectTargetFromForm();
     const data = await postJson('/api/generate', {
@@ -480,7 +488,7 @@ generateBtn.addEventListener('click', async () => {
     alert(error.message);
   } finally {
     setGlobalLoading(false);
-    setButtonLoading(generateBtn, false, 'Generate 3 Tailored Drafts', 'Generating...');
+    setButtonLoading(generateBtn, false, 'Draft Email', 'Generating...');
     generateBtn.disabled = !state.candidate || !state.target;
   }
 });
