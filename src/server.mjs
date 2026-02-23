@@ -7,10 +7,12 @@ import {
   generateEmailVariants
 } from './lib/gemini.mjs';
 import {
+  getCandidateAddedSkills,
   getManualScrapedProfile,
   getSavedCandidateProfile,
   logOutcome,
   resetSavedCandidateProfile,
+  saveCandidateAddedSkills,
   saveManualScrapedProfile,
   saveCandidateProfile,
   saveDraftSession,
@@ -133,6 +135,17 @@ function isTargetProfileSparse(profile) {
   );
 }
 
+function mergeCandidateAddedSkills(profile, addedSkills) {
+  const extra = Array.isArray(addedSkills) ? addedSkills : [];
+  if (!extra.length) return profile;
+  const skillsList = [...new Set([...(profile.skillsList || []), ...extra])];
+  return {
+    ...profile,
+    skillsList,
+    skills: [...new Set([...(profile.skills || []), ...skillsList])]
+  };
+}
+
 const server = http.createServer(async (req, res) => {
   try {
     if (req.method === 'GET' && req.url === '/api/profile') {
@@ -183,9 +196,11 @@ const server = http.createServer(async (req, res) => {
 
       if (scraped.source === 'manual_db') {
         if (body.profileType === 'candidate') {
-          const mapped = normalizeCandidateProfileShape(
+          let mapped = normalizeCandidateProfileShape(
             mapManualToCandidateProfile(scraped.raw, body.url)
           );
+          const addedSkills = await getCandidateAddedSkills(body.url);
+          mapped = mergeCandidateAddedSkills(mapped, addedSkills);
           if (isCandidateProfileSparse(mapped)) {
             return sendJson(res, 422, {
               error: 'Could not extract enough public profile data from this URL.',
@@ -216,9 +231,11 @@ const server = http.createServer(async (req, res) => {
       }
 
       if (body.profileType === 'candidate') {
-        const profile = normalizeCandidateProfileShape(
+        let profile = normalizeCandidateProfileShape(
           mapManualToCandidateProfile(scraped.raw, body.url)
         );
+        const addedSkills = await getCandidateAddedSkills(body.url);
+        profile = mergeCandidateAddedSkills(profile, addedSkills);
         if (isCandidateProfileSparse(profile)) {
           return sendJson(res, 422, {
             error: 'Could not extract enough public profile data from this URL.',
@@ -260,6 +277,9 @@ const server = http.createServer(async (req, res) => {
       }
 
       const saved = await saveCandidateProfile(body.profile);
+      if (body.profile?.linkedinUrl && Array.isArray(body.addedSkills) && body.addedSkills.length > 0) {
+        await saveCandidateAddedSkills(body.profile.linkedinUrl, body.addedSkills);
+      }
       return sendJson(res, 200, { profile: toClientCandidateProfile(saved) });
     }
 

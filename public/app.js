@@ -22,12 +22,16 @@ const targetSnapshotNameEl = document.getElementById('targetSnapshotName');
 const targetSnapshotRoleEl = document.getElementById('targetSnapshotRole');
 const targetSnapshotCompanyEl = document.getElementById('targetSnapshotCompany');
 const targetSnapshotFocusEl = document.getElementById('targetSnapshotFocus');
+const skillInputEl = document.getElementById('skillInput');
+const addSkillBtnEl = document.getElementById('addSkillBtn');
 
 const state = {
   candidate: null,
   target: null,
-  draftSessionId: null
+  draftSessionId: null,
+  userAddedSkills: new Set()
 };
+let skillPersistTimer = null;
 
 function setGlobalLoading(isLoading, message = 'Processing request...') {
   if (!loadingBanner || !loadingText) return;
@@ -93,6 +97,7 @@ function hydrateCandidateForm(profile) {
   const skillsList = Array.isArray(profile.skillsList) ? profile.skillsList : profile.skills || [];
   document.getElementById('candidateSkillsList').value = skillsList.join(', ');
   renderSkillChips(skillsList);
+  state.userAddedSkills = new Set();
   document.getElementById('candidateAchievement').value = profile.achievements?.[0] || '';
   onboardingBlock.classList.add('hidden');
   candidateForm.classList.remove('hidden');
@@ -104,9 +109,54 @@ function renderSkillChips(skills) {
   list.forEach(skill => {
     const chip = document.createElement('span');
     chip.className = 'skill-chip';
-    chip.textContent = skill;
+    const safeSkill = escapeHtml(skill);
+    chip.innerHTML = `<span>${safeSkill}</span><button type="button" data-skill="${safeSkill}">×</button>`;
     skillsChipsEl.appendChild(chip);
   });
+}
+
+function currentSkills() {
+  return document.getElementById('candidateSkillsList').value
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+function setSkills(skills) {
+  const unique = [...new Set(skills.map(s => s.trim()).filter(Boolean))];
+  document.getElementById('candidateSkillsList').value = unique.join(', ');
+  renderSkillChips(unique);
+}
+
+function addSkillFromInput() {
+  const value = (skillInputEl?.value || '').trim();
+  if (!value) return;
+  state.userAddedSkills.add(value);
+  setSkills([...currentSkills(), value]);
+  queuePersistSkills();
+  skillInputEl.value = '';
+  skillInputEl.focus();
+}
+
+function queuePersistSkills() {
+  if (skillPersistTimer) {
+    clearTimeout(skillPersistTimer);
+  }
+  skillPersistTimer = setTimeout(async () => {
+    if (candidateForm.classList.contains('hidden')) return;
+    const profile = collectCandidateFromForm();
+    if (!profile.linkedinUrl) return;
+    try {
+      const payload = await postJson('/api/profile/save', {
+        profile,
+        addedSkills: profile.skillsList
+      });
+      state.candidate = payload.profile;
+      renderProfileSnapshot(payload.profile);
+    } catch (error) {
+      console.warn('Failed to persist skills:', error.message);
+    }
+  }, 250);
 }
 
 function renderProfileSnapshot(profile) {
@@ -190,7 +240,7 @@ function collectCandidateFromForm() {
 
   return {
     id: state.candidate?.id,
-    linkedinUrl: state.candidate?.linkedinUrl || null,
+    linkedinUrl: state.candidate?.linkedinUrl || document.getElementById('candidateUrl').value.trim() || null,
     name: candidateName,
     headline: document.getElementById('candidateHeadline').value.trim(),
     location: document.getElementById('candidateLocation').value.trim(),
@@ -306,6 +356,25 @@ document.getElementById('candidateSkillsList').addEventListener('input', event =
   renderSkillChips(skills);
 });
 
+if (addSkillBtnEl && skillInputEl) {
+  addSkillBtnEl.addEventListener('click', addSkillFromInput);
+  skillInputEl.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      addSkillFromInput();
+    }
+  });
+}
+
+skillsChipsEl.addEventListener('click', event => {
+  const removeBtn = event.target.closest('button[data-skill]');
+  if (!removeBtn) return;
+  const skill = removeBtn.dataset.skill;
+  state.userAddedSkills.delete(skill);
+  setSkills(currentSkills().filter(item => item !== skill));
+  queuePersistSkills();
+});
+
 document.getElementById('candidateNameInline').addEventListener('input', event => {
   document.getElementById('candidateName').value = event.target.value;
 });
@@ -321,8 +390,12 @@ candidateForm.addEventListener('submit', async event => {
     setGlobalLoading(true, 'Saving your profile...');
     setButtonLoading(button, true, 'Save & Continue', 'Saving...');
     state.candidate = collectCandidateFromForm();
-    const payload = await postJson('/api/profile/save', { profile: state.candidate });
+    const payload = await postJson('/api/profile/save', {
+      profile: state.candidate,
+      addedSkills: state.candidate.skillsList
+    });
     state.candidate = payload.profile;
+    state.userAddedSkills = new Set();
     renderProfileSnapshot(payload.profile);
     showWorkspace();
     generateBtn.disabled = !state.target;

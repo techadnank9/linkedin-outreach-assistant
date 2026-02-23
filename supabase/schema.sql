@@ -59,3 +59,11 @@ create table if not exists manual_scraped_profiles (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+create table if not exists candidate_added_skills (
+  id uuid primary key default gen_random_uuid(),
+  linkedin_url text not null,
+  skill text not null,
+  created_at timestamptz not null default now(),
+  unique (linkedin_url, skill)
+);

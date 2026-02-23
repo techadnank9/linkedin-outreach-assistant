@@ -179,3 +179,32 @@ export async function saveManualScrapedProfile({ linkedinUrl, payload }) {
   });
   return rows?.[0] || null;
 }
+
+export async function getCandidateAddedSkills(linkedinUrl) {
+  const normalizedUrl = normalizeLinkedInUrl(linkedinUrl);
+  const rows = await supabaseRequest(
+    `/candidate_added_skills?select=skill&linkedin_url=eq.${encodeURIComponent(normalizedUrl)}`
+  );
+  return (rows || []).map(row => row.skill).filter(Boolean);
+}
+
+export async function saveCandidateAddedSkills(linkedinUrl, skills) {
+  const normalizedUrl = normalizeLinkedInUrl(linkedinUrl);
+  const uniqueSkills = [...new Set((skills || []).map(skill => String(skill).trim()).filter(Boolean))];
+  if (!uniqueSkills.length) return [];
+
+  const rows = await supabaseRequest('/candidate_added_skills?on_conflict=linkedin_url,skill', {
+    method: 'POST',
+    headers: {
+      Prefer: 'resolution=merge-duplicates,return=representation'
+    },
+    body: JSON.stringify(
+      uniqueSkills.map(skill => ({
+        linkedin_url: normalizedUrl,
+        skill
+      }))
+    )
+  });
+
+  return rows || [];
+}
