@@ -46,6 +46,15 @@ export async function saveCandidateProfile(profile) {
     name: profile.name || null,
     headline: profile.headline || null,
     summary: profile.summary || null,
+    location: profile.location || null,
+    email: profile.email || null,
+    phone: profile.phone || null,
+    highest_education: profile.highestEducation || null,
+    years_of_experience:
+      profile.yearsOfExperience === null || profile.yearsOfExperience === undefined
+        ? null
+        : Number(profile.yearsOfExperience),
+    skills_list: profile.skillsList || [],
     achievements: profile.achievements || [],
     skills: profile.skills || []
   };
@@ -57,6 +66,23 @@ export async function saveCandidateProfile(profile) {
   });
 
   return rows[0];
+}
+
+export async function resetSavedCandidateProfile(linkedinUrl = null) {
+  if (linkedinUrl) {
+    const normalizedUrl = normalizeLinkedInUrl(linkedinUrl);
+    await supabaseRequest(
+      `/candidate_profiles?linkedin_url=eq.${encodeURIComponent(normalizedUrl)}`,
+      { method: 'DELETE', headers: { Prefer: 'return=minimal' } }
+    );
+    return;
+  }
+
+  // Fallback: remove all saved candidate profiles in this MVP (single-user behavior).
+  await supabaseRequest('/candidate_profiles?id=not.is.null', {
+    method: 'DELETE',
+    headers: { Prefer: 'return=minimal' }
+  });
 }
 
 export async function saveTargetProfile(profile) {

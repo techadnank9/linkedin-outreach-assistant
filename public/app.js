@@ -3,14 +3,40 @@ const onboardingScreen = document.getElementById('onboardingScreen');
 const workspace = document.getElementById('workspace');
 const candidateForm = document.getElementById('candidateForm');
 const targetForm = document.getElementById('targetForm');
+const composeTitleRow = document.getElementById('composeTitleRow');
 const generateBtn = document.getElementById('generateBtn');
 const variantsEl = document.getElementById('variants');
+const showTargetInputBtn = document.getElementById('showTargetInputBtn');
+const targetInputCard = document.getElementById('targetInputCard');
+const skillsChipsEl = document.getElementById('skillsChips');
+const snapshotNameEl = document.getElementById('snapshotName');
+const snapshotHeadlineEl = document.getElementById('snapshotHeadline');
+const snapshotLocationEl = document.getElementById('snapshotLocation');
+const snapshotExperienceEl = document.getElementById('snapshotExperience');
+const snapshotSkillsEl = document.getElementById('snapshotSkills');
+const targetSnapshotEl = document.getElementById('targetSnapshot');
+const targetSnapshotNameEl = document.getElementById('targetSnapshotName');
+const targetSnapshotRoleEl = document.getElementById('targetSnapshotRole');
+const targetSnapshotCompanyEl = document.getElementById('targetSnapshotCompany');
+const targetSnapshotFocusEl = document.getElementById('targetSnapshotFocus');
 
 const state = {
   candidate: null,
   target: null,
   draftSessionId: null
 };
+
+function updateTargetEntryUI() {
+  if (state.target) {
+    composeTitleRow.classList.add('hidden');
+    targetInputCard.classList.add('hidden');
+    showTargetInputBtn.classList.add('hidden');
+  } else {
+    composeTitleRow.classList.remove('hidden');
+    targetInputCard.classList.remove('hidden');
+    showTargetInputBtn.classList.add('hidden');
+  }
+}
 
 async function postJson(url, payload) {
   const response = await fetch(url, {
@@ -30,10 +56,62 @@ async function postJson(url, payload) {
 function hydrateCandidateForm(profile) {
   document.getElementById('candidateName').value = profile.name || '';
   document.getElementById('candidateHeadline').value = profile.headline || '';
+  document.getElementById('candidateLocation').value = profile.location || '';
+  document.getElementById('candidateEmail').value = profile.email || '';
+  document.getElementById('candidatePhone').value = profile.phone || '';
+  document.getElementById('candidateEducation').value = profile.highestEducation || '';
+  document.getElementById('candidateYearsExperience').value =
+    profile.yearsOfExperience != null ? String(profile.yearsOfExperience) : '';
+  document.getElementById('candidateCompensation').value = profile.compensation || '₹ 0';
+  const skillsList = Array.isArray(profile.skillsList) ? profile.skillsList : profile.skills || [];
+  document.getElementById('candidateSkillsList').value = skillsList.join(', ');
+  renderSkillChips(skillsList);
   document.getElementById('candidateAchievement').value = profile.achievements?.[0] || '';
-  document.getElementById('candidateSkill').value = profile.skills?.[0] || '';
   onboardingBlock.classList.add('hidden');
   candidateForm.classList.remove('hidden');
+}
+
+function renderSkillChips(skills) {
+  skillsChipsEl.innerHTML = '';
+  const list = Array.isArray(skills) ? skills : [];
+  list.forEach(skill => {
+    const chip = document.createElement('span');
+    chip.className = 'skill-chip';
+    chip.textContent = skill;
+    skillsChipsEl.appendChild(chip);
+  });
+}
+
+function renderProfileSnapshot(profile) {
+  if (!profile) {
+    snapshotNameEl.textContent = '-';
+    snapshotHeadlineEl.textContent = '-';
+    snapshotLocationEl.textContent = 'Location: -';
+    snapshotExperienceEl.textContent = 'Experience: -';
+    snapshotSkillsEl.innerHTML = '';
+    return;
+  }
+
+  snapshotNameEl.textContent = profile.name || 'Candidate';
+  snapshotHeadlineEl.textContent = profile.headline || 'No headline provided';
+  snapshotLocationEl.textContent = `Location: ${profile.location || '-'}`;
+  snapshotExperienceEl.textContent = `Experience: ${
+    profile.yearsOfExperience != null && profile.yearsOfExperience !== ''
+      ? `${profile.yearsOfExperience} years`
+      : '-'
+  }`;
+
+  const list = Array.isArray(profile.skillsList) && profile.skillsList.length > 0
+    ? profile.skillsList
+    : (profile.skills || []);
+
+  snapshotSkillsEl.innerHTML = '';
+  list.slice(0, 10).forEach(skill => {
+    const chip = document.createElement('span');
+    chip.className = 'skill-chip';
+    chip.textContent = skill;
+    snapshotSkillsEl.appendChild(chip);
+  });
 }
 
 function showWorkspace() {
@@ -51,17 +129,45 @@ function hydrateTargetForm(profile) {
   document.getElementById('targetRole').value = profile.role || '';
   document.getElementById('targetCompany').value = profile.company || '';
   document.getElementById('targetFocus').value = profile.focusAreas?.[0] || '';
-  targetForm.classList.remove('hidden');
+}
+
+function renderTargetSnapshot(profile) {
+  if (!profile) {
+    targetSnapshotEl.classList.add('hidden');
+    targetSnapshotNameEl.textContent = '-';
+    targetSnapshotRoleEl.textContent = '-';
+    targetSnapshotCompanyEl.textContent = 'Company: -';
+    targetSnapshotFocusEl.textContent = 'Focus: -';
+    return;
+  }
+
+  targetSnapshotNameEl.textContent = profile.name || 'Hiring Manager';
+  targetSnapshotRoleEl.textContent = profile.role || 'Role not available';
+  targetSnapshotCompanyEl.textContent = `Company: ${profile.company || '-'}`;
+  targetSnapshotFocusEl.textContent = `Focus: ${profile.focusAreas?.[0] || '-'}`;
+  targetSnapshotEl.classList.remove('hidden');
 }
 
 function collectCandidateFromForm() {
+  const skillsList = document.getElementById('candidateSkillsList').value
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+
   return {
     id: state.candidate?.id,
     linkedinUrl: state.candidate?.linkedinUrl || null,
     name: document.getElementById('candidateName').value.trim(),
     headline: document.getElementById('candidateHeadline').value.trim(),
+    location: document.getElementById('candidateLocation').value.trim(),
+    email: document.getElementById('candidateEmail').value.trim(),
+    phone: document.getElementById('candidatePhone').value.trim(),
+    highestEducation: document.getElementById('candidateEducation').value.trim(),
+    yearsOfExperience: Number(document.getElementById('candidateYearsExperience').value || 0),
+    compensation: document.getElementById('candidateCompensation').value.trim(),
+    skillsList,
     achievements: [document.getElementById('candidateAchievement').value.trim()].filter(Boolean),
-    skills: [document.getElementById('candidateSkill').value.trim()].filter(Boolean)
+    skills: [...new Set(skillsList.filter(Boolean))]
   };
 }
 
@@ -76,16 +182,37 @@ function collectTargetFromForm() {
   };
 }
 
+function escapeHtml(value) {
+  return String(value || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
 function renderVariants(variants) {
   variantsEl.innerHTML = '';
-  variants.forEach(variant => {
+  variants.forEach((variant, index) => {
     const card = document.createElement('article');
     card.className = 'variant';
+    const safeTone = escapeHtml(variant.tone || `Option ${index + 1}`);
+    const safeSubject = escapeHtml(variant.subject || 'Personalized outreach');
+    const safeBody = escapeHtml(variant.body || '').replaceAll('\n', '<br>');
+
     card.innerHTML = `
-      <h4>${variant.tone.toUpperCase()}</h4>
-      <p><strong>Subject:</strong> ${variant.subject}</p>
-      <p>${variant.body}</p>
-      <button class="copy-btn">Copy</button>
+      <div class="variant-hero">
+        <span class="variant-label">${safeTone}</span>
+        <span class="variant-index">Draft ${index + 1}</span>
+      </div>
+      <div class="variant-content">
+        <p class="variant-subject">${safeSubject}</p>
+        <p class="variant-body">${safeBody}</p>
+      </div>
+      <div class="variant-actions">
+        <button class="copy-btn" type="button">Copy</button>
+        <button class="select-btn" type="button">Use This Draft</button>
+      </div>
     `;
 
     card.querySelector('.copy-btn').addEventListener('click', async () => {
@@ -94,6 +221,11 @@ function renderVariants(variants) {
       setTimeout(() => {
         card.querySelector('.copy-btn').textContent = 'Copy';
       }, 1200);
+    });
+
+    card.querySelector('.select-btn').addEventListener('click', () => {
+      variantsEl.querySelectorAll('.variant').forEach(node => node.classList.remove('active'));
+      card.classList.add('active');
     });
 
     variantsEl.appendChild(card);
@@ -106,6 +238,7 @@ async function loadSavedProfile() {
 
   if (data.profile) {
     state.candidate = data.profile;
+    renderProfileSnapshot(data.profile);
     showWorkspace();
     generateBtn.disabled = !state.target;
     return;
@@ -120,9 +253,18 @@ document.getElementById('extractCandidateBtn').addEventListener('click', async (
     const data = await postJson('/api/extract', { url, profileType: 'candidate' });
     state.candidate = data.profile;
     hydrateCandidateForm(data.profile);
+    renderProfileSnapshot(data.profile);
   } catch (error) {
     alert(error.message);
   }
+});
+
+document.getElementById('candidateSkillsList').addEventListener('input', event => {
+  const skills = event.target.value
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+  renderSkillChips(skills);
 });
 
 candidateForm.addEventListener('submit', async event => {
@@ -131,6 +273,7 @@ candidateForm.addEventListener('submit', async event => {
     state.candidate = collectCandidateFromForm();
     const payload = await postJson('/api/profile/save', { profile: state.candidate });
     state.candidate = payload.profile;
+    renderProfileSnapshot(payload.profile);
     showWorkspace();
     generateBtn.disabled = !state.target;
   } catch (error) {
@@ -144,22 +287,43 @@ document.getElementById('extractTargetBtn').addEventListener('click', async () =
     const data = await postJson('/api/extract', { url, profileType: 'target' });
     state.target = data.profile;
     hydrateTargetForm(data.profile);
+    renderTargetSnapshot(data.profile);
+    updateTargetEntryUI();
     generateBtn.disabled = !state.candidate;
   } catch (error) {
     alert(error.message);
   }
 });
 
-document.getElementById('refreshProfileBtn').addEventListener('click', () => {
+showTargetInputBtn.addEventListener('click', () => {
+  targetInputCard.classList.remove('hidden');
+  document.getElementById('targetUrl').focus();
+});
+
+document.getElementById('refreshProfileBtn').addEventListener('click', async () => {
+  try {
+    await postJson('/api/profile/reset', {
+      linkedinUrl: state.candidate?.linkedinUrl || null
+    });
+  } catch (error) {
+    alert(error.message);
+    return;
+  }
+
   showOnboarding();
   onboardingBlock.classList.remove('hidden');
   candidateForm.classList.add('hidden');
   targetForm.classList.add('hidden');
+  targetInputCard.classList.add('hidden');
   variantsEl.innerHTML = '';
   document.getElementById('candidateUrl').value = '';
+  document.getElementById('targetUrl').value = '';
   state.candidate = null;
   state.target = null;
   state.draftSessionId = null;
+  renderProfileSnapshot(null);
+  renderTargetSnapshot(null);
+  updateTargetEntryUI();
   generateBtn.disabled = true;
 });
 
@@ -179,3 +343,4 @@ generateBtn.addEventListener('click', async () => {
 });
 
 loadSavedProfile();
+updateTargetEntryUI();

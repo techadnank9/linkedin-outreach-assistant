@@ -19,12 +19,41 @@ function extractAchievements(payload) {
     .slice(0, 5);
 }
 
+function extractHighestEducation(payload) {
+  if (!Array.isArray(payload?.educations) || payload.educations.length === 0) return null;
+  const edu = payload.educations[0] || {};
+  const title = edu.title || '';
+  const subtitle = edu.subtitle || '';
+  const value = `${title}${title && subtitle ? ', ' : ''}${subtitle}`.trim();
+  return value || null;
+}
+
+function extractYearsOfExperience(payload) {
+  if (typeof payload?.totalExperienceYears === 'number') return payload.totalExperienceYears;
+  if (typeof payload?.firstRoleYear === 'number') {
+    const currentYear = new Date().getFullYear();
+    return Math.max(0, currentYear - payload.firstRoleYear);
+  }
+  return null;
+}
+
 export function mapManualToCandidateProfile(payload, linkedinUrl) {
   return {
     linkedinUrl: linkedinUrl || payload?.linkedinUrl || payload?.linkedinPublicUrl || null,
     name: payload?.fullName || [payload?.firstName, payload?.lastName].filter(Boolean).join(' ') || null,
     headline: payload?.headline || payload?.jobTitle || null,
     summary: payload?.about || null,
+    location:
+      payload?.addressWithCountry ||
+      payload?.addressWithoutCountry ||
+      payload?.addressCountryOnly ||
+      payload?.jobLocation ||
+      null,
+    email: payload?.email || null,
+    phone: payload?.mobileNumber || null,
+    highestEducation: extractHighestEducation(payload),
+    yearsOfExperience: extractYearsOfExperience(payload),
+    skillsList: extractSkills(payload),
     achievements: extractAchievements(payload),
     skills: extractSkills(payload)
   };

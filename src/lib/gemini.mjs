@@ -34,7 +34,8 @@ export async function extractCandidateProfile({ linkedinUrl, rawText }) {
   const prompt = `
 Extract a candidate profile JSON from this LinkedIn text.
 Return only valid JSON with keys:
-name, headline, summary, achievements (array of strings), skills (array of strings), linkedinUrl.
+name, headline, summary, location, email, phone, highestEducation, yearsOfExperience,
+skillsList (array of strings), achievements (array of strings), skills (array of strings), linkedinUrl.
 linkedinUrl must be: ${linkedinUrl}
 \nLinkedIn text:\n${rawText}
 `;

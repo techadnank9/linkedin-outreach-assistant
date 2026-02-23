@@ -45,14 +45,43 @@
 
         <form id="candidateForm" class="stack hidden">
           <h3>Review Your Profile</h3>
+          <section class="profile-facts">
+            <div class="fact-row">
+              <span class="fact-icon" aria-hidden="true">📍</span>
+              <input id="candidateLocation" class="fact-input" placeholder="Location" />
+            </div>
+            <div class="fact-row">
+              <span class="fact-icon" aria-hidden="true">🧳</span>
+              <input id="candidateYearsExperience" class="fact-input" placeholder="Years of Experience" />
+            </div>
+            <div class="fact-row">
+              <span class="fact-icon" aria-hidden="true">💼</span>
+              <input id="candidateCompensation" class="fact-input" placeholder="₹ 0" />
+            </div>
+          </section>
+
           <label>Name</label>
           <input id="candidateName" />
           <label>Headline</label>
           <input id="candidateHeadline" />
+          <label>Email</label>
+          <input id="candidateEmail" />
+          <label>Phone</label>
+          <input id="candidatePhone" />
+          <label>Highest Education</label>
+          <input id="candidateEducation" />
+
+          <section class="skills-card">
+            <div class="skills-header-row">
+              <h4>Key skills</h4>
+            </div>
+            <div id="skillsChips" class="skills-chips"></div>
+          </section>
+
+          <label>Skills List (comma-separated)</label>
+          <input id="candidateSkillsList" />
           <label>Top Achievement</label>
           <input id="candidateAchievement" />
-          <label>Top Skill</label>
-          <input id="candidateSkill" />
           <button type="submit">Save & Continue</button>
         </form>
       </section>
@@ -60,19 +89,42 @@
 
       <section id="workspace" class="layout hidden">
         <section class="panel context">
-          <h2>Your Profile (Saved)</h2>
-          <p class="subtitle">Your profile is reused for every outreach draft.</p>
+          <div class="profile-snapshot">
+            <h3 id="snapshotName">-</h3>
+            <p id="snapshotHeadline">-</p>
+            <div class="snapshot-facts">
+              <span id="snapshotLocation" class="snapshot-pill">Location: -</span>
+              <span id="snapshotExperience" class="snapshot-pill">Experience: -</span>
+            </div>
+            <div id="snapshotSkills" class="skills-chips"></div>
+          </div>
         </section>
 
       <section class="panel composer">
-        <h2>Target + Compose</h2>
-        <div class="stack">
-          <label>Hiring Manager/Founder LinkedIn URL</label>
-          <input id="targetUrl" type="url" placeholder="https://www.linkedin.com/in/hiring-manager" />
+        <div id="composeTitleRow" class="compose-title-row">
+          <h2>Target + Compose</h2>
+          <p class="compose-subtitle">Extract hiring manager context, review details, then generate tailored outreach.</p>
+        </div>
+
+        <div class="target-actions-row">
+          <button id="showTargetInputBtn" class="ghost hidden" type="button">Change Hiring Manager</button>
+        </div>
+
+        <div id="targetInputCard" class="target-card stack">
+          <input id="targetUrl" type="url" placeholder="Paste hiring manager LinkedIn URL" />
           <button id="extractTargetBtn">Extract Target</button>
         </div>
 
-        <form id="targetForm" class="stack hidden">
+        <div id="targetSnapshot" class="profile-snapshot hidden">
+          <h3 id="targetSnapshotName">-</h3>
+          <p id="targetSnapshotRole">-</p>
+          <div class="snapshot-facts">
+            <span id="targetSnapshotCompany" class="snapshot-pill">Company: -</span>
+            <span id="targetSnapshotFocus" class="snapshot-pill">Focus: -</span>
+          </div>
+        </div>
+
+        <form id="targetForm" class="stack hidden target-form">
           <label>Name</label>
           <input id="targetName" />
           <label>Role</label>
@@ -83,7 +135,7 @@
           <input id="targetFocus" />
         </form>
 
-        <button id="generateBtn" class="primary" disabled>Generate 3 Emails</button>
+        <button id="generateBtn" class="ghost action-generate" disabled>Generate 3 Emails</button>
 
         <div id="variants" class="variants"></div>
       </section>

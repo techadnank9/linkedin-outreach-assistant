@@ -6,6 +6,12 @@ export function toClientCandidateProfile(row) {
     name: row.name,
     headline: row.headline,
     summary: row.summary,
+    location: row.location || null,
+    email: row.email || null,
+    phone: row.phone || null,
+    highestEducation: row.highest_education || null,
+    yearsOfExperience: row.years_of_experience == null ? null : Number(row.years_of_experience),
+    skillsList: row.skills_list || [],
     achievements: row.achievements || [],
     skills: row.skills || []
   };

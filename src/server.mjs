@@ -12,6 +12,7 @@ import {
   getManualScrapedProfile,
   getSavedCandidateProfile,
   logOutcome,
+  resetSavedCandidateProfile,
   saveManualScrapedProfile,
   saveCandidateProfile,
   saveDraftSession,
@@ -152,6 +153,12 @@ const server = http.createServer(async (req, res) => {
 
       const saved = await saveCandidateProfile(body.profile);
       return sendJson(res, 200, { profile: toClientCandidateProfile(saved) });
+    }
+
+    if (req.method === 'POST' && req.url === '/api/profile/reset') {
+      const body = await parseBody(req);
+      await resetSavedCandidateProfile(body?.linkedinUrl || null);
+      return sendJson(res, 200, { ok: true });
     }
 
     if (req.method === 'POST' && req.url === '/api/generate') {
