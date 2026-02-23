@@ -10,7 +10,7 @@
     <header class="topbar">
       <div>
         <h1>LinkedIn Outreach Assistant</h1>
-        <p>Personalized outreach drafts from your profile + hiring manager profile</p>
+        <p>Generate professional, personalized outreach emails using your profile and hiring manager context.</p>
       </div>
       <button id="refreshProfileBtn" class="ghost">Refresh Profile</button>
     </header>
@@ -18,13 +18,29 @@
     <main>
       <section id="onboardingScreen" class="onboarding-screen">
         <div class="panel onboarding-card">
+          <div class="eyebrow-row">
+            <span class="chip">LinkedIn URL in 1 step</span>
+          </div>
           <h2>Start With Your LinkedIn</h2>
-          <p class="subtitle">Paste your profile URL once. We will extract and prefill your profile details.</p>
 
           <div id="onboardingBlock" class="stack">
-          <label>Your LinkedIn URL (one-time)</label>
+          <label>Your LinkedIn URL</label>
           <input id="candidateUrl" type="url" placeholder="https://www.linkedin.com/in/your-name" />
           <button id="extractCandidateBtn">Extract & Fill</button>
+          <div class="info-grid">
+            <div class="info-item">
+              <strong>Step 1</strong>
+              <span>Paste profile URL</span>
+            </div>
+            <div class="info-item">
+              <strong>Step 2</strong>
+              <span>Review extracted details</span>
+            </div>
+            <div class="info-item">
+              <strong>Step 3</strong>
+              <span>Generate 3 email options</span>
+            </div>
+          </div>
         </div>
 
         <form id="candidateForm" class="stack hidden">
