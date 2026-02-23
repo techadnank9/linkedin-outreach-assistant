@@ -4,8 +4,6 @@ import path from 'node:path';
 import { loadDotEnv } from './lib/load-env.mjs';
 import { checkApifyActorHealth, profileTextFromRaw, scrapeLinkedInProfile } from './lib/apify.mjs';
 import {
-  extractCandidateProfile,
-  extractTargetProfile,
   generateEmailVariants
 } from './lib/gemini.mjs';
 import {
@@ -26,6 +24,10 @@ loadDotEnv();
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 const PUBLIC_DIR = path.resolve(process.cwd(), 'public');
+const REQUESTS_PER_MINUTE = Number(process.env.EXTRACT_IP_MAX_PER_MIN || 20);
+const URL_COOLDOWN_MS = Number(process.env.EXTRACT_URL_COOLDOWN_MS || 15000);
+const ipWindow = new Map();
+const urlWindow = new Map();
 
 function sendJson(res, statusCode, payload) {
   res.writeHead(statusCode, { 'Content-Type': 'application/json' });
@@ -69,6 +71,80 @@ function serveStatic(req, res) {
   fs.createReadStream(filePath).pipe(res);
 }
 
+function canProcessByIp(ip) {
+  const now = Date.now();
+  const entries = (ipWindow.get(ip) || []).filter(ts => now - ts < 60000);
+  entries.push(now);
+  ipWindow.set(ip, entries);
+  return entries.length <= REQUESTS_PER_MINUTE;
+}
+
+function canProcessByUrl(url) {
+  const now = Date.now();
+  const previous = urlWindow.get(url) || 0;
+  if (now - previous < URL_COOLDOWN_MS) {
+    return false;
+  }
+  urlWindow.set(url, now);
+  return true;
+}
+
+function cleanNullableString(value) {
+  if (value === null || value === undefined) return null;
+  const v = String(value).trim();
+  return v.length ? v : null;
+}
+
+function normalizeCandidateProfileShape(profile) {
+  return {
+    ...profile,
+    name: cleanNullableString(profile?.name),
+    headline: cleanNullableString(profile?.headline),
+    summary: cleanNullableString(profile?.summary),
+    location: cleanNullableString(profile?.location),
+    email: cleanNullableString(profile?.email),
+    phone: cleanNullableString(profile?.phone),
+    highestEducation: cleanNullableString(profile?.highestEducation),
+    yearsOfExperience:
+      profile?.yearsOfExperience === '' || profile?.yearsOfExperience === undefined
+        ? null
+        : profile?.yearsOfExperience,
+    skillsList: Array.isArray(profile?.skillsList) ? profile.skillsList.filter(Boolean) : [],
+    achievements: Array.isArray(profile?.achievements) ? profile.achievements.filter(Boolean) : [],
+    skills: Array.isArray(profile?.skills) ? profile.skills.filter(Boolean) : []
+  };
+}
+
+function normalizeTargetProfileShape(profile) {
+  return {
+    ...profile,
+    name: cleanNullableString(profile?.name),
+    role: cleanNullableString(profile?.role),
+    company: cleanNullableString(profile?.company),
+    focusAreas: Array.isArray(profile?.focusAreas) ? profile.focusAreas.filter(Boolean) : []
+  };
+}
+
+function isCandidateProfileSparse(profile) {
+  return !(
+    profile?.name ||
+    profile?.headline ||
+    profile?.summary ||
+    profile?.location ||
+    (Array.isArray(profile?.skillsList) && profile.skillsList.length > 0) ||
+    (Array.isArray(profile?.achievements) && profile.achievements.length > 0)
+  );
+}
+
+function isTargetProfileSparse(profile) {
+  return !(
+    profile?.name ||
+    profile?.role ||
+    profile?.company ||
+    (Array.isArray(profile?.focusAreas) && profile.focusAreas.length > 0)
+  );
+}
+
 const server = http.createServer(async (req, res) => {
   try {
     if (req.method === 'GET' && req.url === '/api/profile') {
@@ -86,50 +162,97 @@ const server = http.createServer(async (req, res) => {
       if (!body.url || !body.profileType) {
         return sendJson(res, 400, { error: 'url and profileType are required' });
       }
+      const ip = req.socket?.remoteAddress || 'unknown';
+      if (!canProcessByIp(ip)) {
+        return sendJson(res, 429, { error: 'Too many extraction requests. Please wait and retry.' });
+      }
+      if (!canProcessByUrl(body.url)) {
+        return sendJson(res, 429, { error: 'This profile was requested moments ago. Please retry shortly.' });
+      }
 
       let scraped;
-      const manual = await getManualScrapedProfile(body.url);
-      if (manual?.payload) {
-        scraped = {
-          raw: manual.payload,
-          rawText: profileTextFromRaw(manual.payload)
-        };
-        console.log('[MANUAL_PROFILE_JSON]', JSON.stringify(scraped.raw, null, 2));
+      try {
+        const manual = await getManualScrapedProfile(body.url);
+        if (manual?.payload) {
+          scraped = {
+            raw: manual.payload,
+            rawText: profileTextFromRaw(manual.payload),
+            source: 'manual_db'
+          };
+        } else {
+          const apify = await scrapeLinkedInProfile(body.url);
+          scraped = {
+            raw: apify.raw,
+            rawText: apify.rawText || profileTextFromRaw(apify.raw),
+            source: 'apify'
+          };
+        }
+      } catch (error) {
+        return sendJson(res, 502, {
+          error: `Profile extraction failed: ${error.message}`,
+          code: 'EXTRACTION_FAILED'
+        });
+      }
+      console.log(`[SCRAPE_SOURCE] ${scraped.source} ${body.url}`);
+      console.log('[SCRAPED_PROFILE_JSON]', JSON.stringify(scraped.raw, null, 2));
+
+      if (scraped.source === 'manual_db') {
         if (body.profileType === 'candidate') {
-          const savedCandidate = await saveCandidateProfile(
-            mapManualToCandidateProfile(manual.payload, body.url)
+          const mapped = normalizeCandidateProfileShape(
+            mapManualToCandidateProfile(scraped.raw, body.url)
           );
+          if (isCandidateProfileSparse(mapped)) {
+            return sendJson(res, 422, {
+              error: 'Could not extract enough public profile data from this URL.',
+              code: 'PROFILE_TOO_SPARSE',
+              source: scraped.source
+            });
+          }
+          const savedCandidate = await saveCandidateProfile(mapped);
           return sendJson(res, 200, {
             profile: toClientCandidateProfile(savedCandidate),
             source: 'manual_db'
           });
         }
 
-        const savedTarget = await saveTargetProfile(
-          mapManualToTargetProfile(manual.payload, body.url)
-        );
+        const mapped = normalizeTargetProfileShape(mapManualToTargetProfile(scraped.raw, body.url));
+        if (isTargetProfileSparse(mapped)) {
+          return sendJson(res, 422, {
+            error: 'Could not extract enough public target profile data from this URL.',
+            code: 'PROFILE_TOO_SPARSE',
+            source: scraped.source
+          });
+        }
+        const savedTarget = await saveTargetProfile(mapped);
         return sendJson(res, 200, {
           profile: toClientTargetProfile(savedTarget),
           source: 'manual_db'
         });
-      } else {
-        scraped = await scrapeLinkedInProfile(body.url);
-        console.log('[SCRAPED_PROFILE_JSON]', JSON.stringify(scraped.raw, null, 2));
       }
 
       if (body.profileType === 'candidate') {
-        const profile = await extractCandidateProfile({
-          linkedinUrl: body.url,
-          rawText: scraped.rawText
-        });
-        return sendJson(res, 200, { profile });
+        const profile = normalizeCandidateProfileShape(
+          mapManualToCandidateProfile(scraped.raw, body.url)
+        );
+        if (isCandidateProfileSparse(profile)) {
+          return sendJson(res, 422, {
+            error: 'Could not extract enough public profile data from this URL.',
+            code: 'PROFILE_TOO_SPARSE',
+            source: scraped.source
+          });
+        }
+        return sendJson(res, 200, { profile, source: scraped.source });
       }
 
-      const profile = await extractTargetProfile({
-        linkedinUrl: body.url,
-        rawText: scraped.rawText
-      });
-      return sendJson(res, 200, { profile });
+      const profile = normalizeTargetProfileShape(mapManualToTargetProfile(scraped.raw, body.url));
+      if (isTargetProfileSparse(profile)) {
+        return sendJson(res, 422, {
+          error: 'Could not extract enough public target profile data from this URL.',
+          code: 'PROFILE_TOO_SPARSE',
+          source: scraped.source
+        });
+      }
+      return sendJson(res, 200, { profile, source: scraped.source });
     }
 
     if (req.method === 'POST' && req.url === '/api/manual-profile/save') {
