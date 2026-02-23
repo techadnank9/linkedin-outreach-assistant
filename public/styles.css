@@ -157,7 +157,23 @@ input {
   background: #fdfefe;
   transition: border-color 120ms ease, box-shadow 120ms ease;
 }
+textarea {
+  padding: 0.82rem 0.9rem;
+  border: 1px solid #cfd8e3;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  background: #fdfefe;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 96px;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
 input:focus {
+  outline: none;
+  border-color: #57b8ae;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+}
+textarea:focus {
   outline: none;
   border-color: #57b8ae;
   box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);

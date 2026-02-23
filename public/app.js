@@ -22,12 +22,18 @@ const targetSnapshotNameEl = document.getElementById('targetSnapshotName');
 const targetSnapshotRoleEl = document.getElementById('targetSnapshotRole');
 const targetSnapshotCompanyEl = document.getElementById('targetSnapshotCompany');
 const targetSnapshotFocusEl = document.getElementById('targetSnapshotFocus');
+const jobSnapshotEl = document.getElementById('jobSnapshot');
+const jobSnapshotRoleEl = document.getElementById('jobSnapshotRole');
+const jobSnapshotCompanyEl = document.getElementById('jobSnapshotCompany');
+const jobSnapshotLocationEl = document.getElementById('jobSnapshotLocation');
+const jobSnapshotWorkModeEl = document.getElementById('jobSnapshotWorkMode');
 const skillInputEl = document.getElementById('skillInput');
 const addSkillBtnEl = document.getElementById('addSkillBtn');
 
 const state = {
   candidate: null,
   target: null,
+  jobContext: null,
   draftSessionId: null,
   userAddedSkills: new Set()
 };
@@ -233,6 +239,23 @@ function renderTargetSnapshot(profile) {
   targetSnapshotEl.classList.remove('hidden');
 }
 
+function renderJobSnapshot(jobContext) {
+  if (!jobContext) {
+    jobSnapshotEl.classList.add('hidden');
+    jobSnapshotRoleEl.textContent = 'Role: -';
+    jobSnapshotCompanyEl.textContent = 'Company: -';
+    jobSnapshotLocationEl.textContent = 'Location: -';
+    jobSnapshotWorkModeEl.textContent = 'Work mode: -';
+    return;
+  }
+
+  jobSnapshotRoleEl.textContent = `Role: ${jobContext.roleTitle || '-'}`;
+  jobSnapshotCompanyEl.textContent = `Company: ${jobContext.company || '-'}`;
+  jobSnapshotLocationEl.textContent = `Location: ${jobContext.location || '-'}`;
+  jobSnapshotWorkModeEl.textContent = `Work mode: ${jobContext.workMode || '-'}`;
+  jobSnapshotEl.classList.remove('hidden');
+}
+
 function collectCandidateFromForm() {
   const candidateName = document.getElementById('candidateNameInline').value.trim();
   document.getElementById('candidateName').value = candidateName;
@@ -263,7 +286,7 @@ function collectCandidateFromForm() {
 }
 
 function collectTargetFromForm() {
-  return {
+  const target = {
     id: state.target?.id,
     linkedinUrl: state.target?.linkedinUrl || null,
     name: document.getElementById('targetName').value.trim(),
@@ -271,6 +294,13 @@ function collectTargetFromForm() {
     company: document.getElementById('targetCompany').value.trim(),
     focusAreas: [document.getElementById('targetFocus').value.trim()].filter(Boolean)
   };
+  const hasMeaningfulTarget =
+    Boolean(target.linkedinUrl || target.name || target.role || target.company || target.focusAreas.length);
+  return hasMeaningfulTarget ? target : null;
+}
+
+function canDraftEmail() {
+  return Boolean(state.candidate && (state.target || state.jobContext));
 }
 
 function escapeHtml(value) {
@@ -331,7 +361,7 @@ async function loadSavedProfile() {
     state.candidate = data.profile;
     renderProfileSnapshot(data.profile);
     showWorkspace();
-    generateBtn.disabled = !state.target;
+    generateBtn.disabled = !canDraftEmail();
     return;
   }
 
@@ -406,7 +436,7 @@ candidateForm.addEventListener('submit', async event => {
     state.userAddedSkills = new Set();
     renderProfileSnapshot(payload.profile);
     showWorkspace();
-    generateBtn.disabled = !state.target;
+    generateBtn.disabled = !canDraftEmail();
   } catch (error) {
     alert(error.message);
   } finally {
@@ -426,12 +456,31 @@ document.getElementById('extractTargetBtn').addEventListener('click', async () =
     hydrateTargetForm(data.profile);
     renderTargetSnapshot(data.profile);
     updateTargetEntryUI();
-    generateBtn.disabled = !state.candidate;
+    generateBtn.disabled = !canDraftEmail();
   } catch (error) {
     alert(error.message);
   } finally {
     setGlobalLoading(false);
     setButtonLoading(button, false, 'Analyze Hiring Profile', 'Analyzing...');
+  }
+});
+
+document.getElementById('extractJobBtn').addEventListener('click', async () => {
+  const button = document.getElementById('extractJobBtn');
+  try {
+    setGlobalLoading(true, 'Analyzing job post...');
+    setButtonLoading(button, true, 'Analyze Job Post', 'Analyzing...');
+    const jobPostUrl = document.getElementById('jobPostUrl').value.trim();
+    const jobText = document.getElementById('jobPostText').value.trim();
+    const data = await postJson('/api/job/extract', { jobPostUrl, jobText });
+    state.jobContext = data.jobContext;
+    renderJobSnapshot(state.jobContext);
+    generateBtn.disabled = !canDraftEmail();
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    setGlobalLoading(false);
+    setButtonLoading(button, false, 'Analyze Job Post', 'Analyzing...');
   }
 });
 
@@ -465,9 +514,11 @@ refreshProfileBtn.addEventListener('click', async () => {
   document.getElementById('targetUrl').value = '';
   state.candidate = null;
   state.target = null;
+  state.jobContext = null;
   state.draftSessionId = null;
   renderProfileSnapshot(null);
   renderTargetSnapshot(null);
+  renderJobSnapshot(null);
   updateTargetEntryUI();
   generateBtn.disabled = true;
 });
@@ -476,11 +527,14 @@ generateBtn.addEventListener('click', async () => {
   try {
     setGlobalLoading(true, 'Generating personalized email drafts...');
     setButtonLoading(generateBtn, true, 'Draft Email', 'Generating...');
-    state.candidate = collectCandidateFromForm();
+    if (!candidateForm.classList.contains('hidden')) {
+      state.candidate = collectCandidateFromForm();
+    }
     state.target = collectTargetFromForm();
     const data = await postJson('/api/generate', {
       candidate: state.candidate,
-      target: state.target
+      target: state.target,
+      jobContext: state.jobContext
     });
     state.draftSessionId = data.draftSessionId;
     renderVariants(data.variants);
@@ -489,9 +543,10 @@ generateBtn.addEventListener('click', async () => {
   } finally {
     setGlobalLoading(false);
     setButtonLoading(generateBtn, false, 'Draft Email', 'Generating...');
-    generateBtn.disabled = !state.candidate || !state.target;
+    generateBtn.disabled = !canDraftEmail();
   }
 });
 
 loadSavedProfile();
 updateTargetEntryUI();
+renderJobSnapshot(null);

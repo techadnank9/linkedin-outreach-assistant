@@ -102,7 +102,7 @@
       <section class="panel composer">
         <div id="composeTitleRow" class="compose-title-row">
           <h2>Outreach Composer</h2>
-          <p class="compose-subtitle">Add the hiring manager profile to generate polished, personalized outreach drafts.</p>
+          <p class="compose-subtitle">Add hiring manager and job context to draft role-specific outreach emails.</p>
         </div>
 
         <div class="target-actions-row">
@@ -120,6 +120,21 @@
           <div class="snapshot-facts">
             <span id="targetSnapshotCompany" class="snapshot-pill">Company: -</span>
             <span id="targetSnapshotFocus" class="snapshot-pill hidden"></span>
+          </div>
+        </div>
+
+        <div id="jobInputCard" class="target-card stack">
+          <input id="jobPostUrl" type="url" placeholder="Optional: paste job post URL" />
+          <textarea id="jobPostText" rows="4" placeholder="Or paste job description text"></textarea>
+          <button id="extractJobBtn" class="ghost" type="button">Analyze Job Post</button>
+        </div>
+
+        <div id="jobSnapshot" class="profile-snapshot hidden">
+          <h3 id="jobSnapshotRole">Role: -</h3>
+          <p id="jobSnapshotCompany">Company: -</p>
+          <div class="snapshot-facts">
+            <span id="jobSnapshotLocation" class="snapshot-pill">Location: -</span>
+            <span id="jobSnapshotWorkMode" class="snapshot-pill">Work mode: -</span>
           </div>
         </div>
 

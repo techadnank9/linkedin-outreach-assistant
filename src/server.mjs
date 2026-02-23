@@ -4,6 +4,7 @@ import path from 'node:path';
 import { loadDotEnv } from './lib/load-env.mjs';
 import { checkApifyActorHealth, profileTextFromRaw, scrapeLinkedInProfile } from './lib/apify.mjs';
 import {
+  extractJobContext,
   generateEmailVariants
 } from './lib/gemini.mjs';
 import {
@@ -144,6 +145,40 @@ function mergeCandidateAddedSkills(profile, addedSkills) {
     skillsList,
     skills: [...new Set([...(profile.skills || []), ...skillsList])]
   };
+}
+
+function htmlToPlainText(html) {
+  return String(html || '')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+async function fetchTextFromUrl(url) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12000);
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Mozilla/5.0',
+        Accept: 'text/html,application/xhtml+xml'
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`Job post fetch failed: ${response.status}`);
+    }
+    const html = await response.text();
+    return htmlToPlainText(html);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 const server = http.createServer(async (req, res) => {
@@ -291,28 +326,62 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'POST' && req.url === '/api/generate') {
       const body = await parseBody(req);
-      if (!body.candidate || !body.target) {
-        return sendJson(res, 400, { error: 'candidate and target are required' });
+      console.log('[GENERATE_REQUEST_PAYLOAD]', JSON.stringify({
+        candidate: body?.candidate || null,
+        target: body?.target || null,
+        jobContext: body?.jobContext || null
+      }, null, 2));
+      if (!body.candidate) {
+        return sendJson(res, 400, { error: 'candidate is required' });
+      }
+      if (!body.target && !body.jobContext) {
+        return sendJson(res, 400, { error: 'target or jobContext is required' });
       }
 
-      const savedTarget = await saveTargetProfile(body.target);
+      const savedTarget = body.target ? await saveTargetProfile(body.target) : null;
       const variants = await generateEmailVariants({
         candidate: body.candidate,
-        target: body.target
+        target: body.target || null,
+        jobContext: body.jobContext || null
       });
 
       const candidateProfileId = body.candidate.id || null;
       const session = await saveDraftSession({
         candidateProfileId,
-        targetProfileId: savedTarget.id,
+        targetProfileId: savedTarget?.id || null,
         variants
       });
 
       return sendJson(res, 200, {
         variants,
         draftSessionId: session.id,
-        targetProfile: toClientTargetProfile(savedTarget)
+        targetProfile: savedTarget ? toClientTargetProfile(savedTarget) : null
       });
+    }
+
+    if (req.method === 'POST' && req.url === '/api/job/extract') {
+      const body = await parseBody(req);
+      if (!body.jobPostUrl && !body.jobText) {
+        return sendJson(res, 400, { error: 'jobPostUrl or jobText is required' });
+      }
+
+      const sourceText = body.jobText?.trim()
+        ? body.jobText.trim()
+        : await fetchTextFromUrl(body.jobPostUrl);
+
+      if (!sourceText || sourceText.length < 80) {
+        return sendJson(res, 422, { error: 'Could not extract enough job post content.' });
+      }
+
+      const jobContext = await extractJobContext({
+        jobPostUrl: body.jobPostUrl || '',
+        rawText: sourceText.slice(0, 12000)
+      });
+      console.log('[JOB_CONTEXT_EXTRACTED]', JSON.stringify({
+        jobPostUrl: body.jobPostUrl || null,
+        jobContext
+      }, null, 2));
+      return sendJson(res, 200, { jobContext });
     }
 
     if (req.method === 'POST' && req.url === '/api/outcomes') {
